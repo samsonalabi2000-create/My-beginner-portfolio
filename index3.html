@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Alex Mercer — Software Designer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+    <link href="./css/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cream: #F5F0E8;
+      --ink: #1A1A1A;
+      --rust: #C4622D;
+      --sage: #7A8C6E;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: var(--cream);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      width: 10px; height: 10px;
+      background: var(--rust);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--rust);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.35s ease, opacity 0.3s ease;
+      transform: translate(-50%, -50%);
+      opacity: 0.5;
+    }
+
+    /* Noise overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    .playfair { font-family: 'Playfair Display', serif; }
+
+    /* Fade-in animation */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.7s ease forwards; opacity: 0; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.25s; }
+    .delay-3 { animation-delay: 0.4s; }
+    .delay-4 { animation-delay: 0.55s; }
+    .delay-5 { animation-delay: 0.7s; }
+
+    /* Underline hover */
+    .hover-line {
+      position: relative;
+      display: inline-block;
+    }
+    .hover-line::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0;
+      width: 0; height: 1.5px;
+      background: var(--rust);
+      transition: width 0.35s ease;
+    }
+    .hover-line:hover::after { width: 100%; }
+
+    /* Project card */
+    .card {
+      background: #EDEAE0;
+      border: 1px solid rgba(26,26,26,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 6px 10px 0 rgba(196,98,45,0.15);
+    }
+
+    /* Tag */
+    .tag {
+      border: 1px solid rgba(26,26,26,0.25);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+    }
+
+    /* Skill bar */
+    .skill-bar {
+      height: 3px;
+      background: rgba(26,26,26,0.12);
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-fill {
+      height: 100%;
+      background: var(--rust);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 1s cubic-bezier(0.16,1,0.3,1);
+    }
+    .skill-fill.animate { transform: scaleX(1); }
+
+    /* Section label */
+    .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--rust);
+    }
+
+    /* Divider */
+    .divider { border-color: rgba(26,26,26,0.12); }
+
+    /* CTA button */
+    .btn-primary {
+      background: var(--ink);
+      color: var(--cream);
+      transition: background 0.25s ease, transform 0.2s ease;
+    }
+    .btn-primary:hover {
+      background: var(--rust);
+      transform: translateY(-2px);
+    }
+
+    /* Nav link */
+    .nav-link {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.55;
+      transition: opacity 0.2s;
+    }
+    .nav-link:hover { opacity: 1; }
+
+    /* Contact input */
+    .field {
+      background: transparent;
+      border-bottom: 1px solid rgba(26,26,26,0.25);
+      outline: none;
+      width: 100%;
+      padding: 8px 0;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      transition: border-color 0.2s;
+      color: var(--ink);
+    }
+    .field:focus { border-color: var(--rust); }
+    .field::placeholder { opacity: 0.4; }
+  </style>
+</head>
+<body class="relative">
+
+  <!-- Custom cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- ─── NAV ─── -->
+  <nav class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5" style="background:rgba(245,240,232,0.85);backdrop-filter:blur(10px);">
+    <span class="playfair text-base font-bold tracking-tight">SA.</span>
+    <div class="flex gap-8">
+      <a href="#work" class="nav-link hover-line">Work</a>
+      <a href="#about" class="nav-link hover-line">About</a>
+      <a href="#contact" class="nav-link hover-line">Contact</a>
+    </div>
+  </nav>
+
+  <!-- ─── HERO ─── -->
+  <section class="relative min-h-screen flex flex-col justify-center px-8 md:px-20 pt-24 pb-16 overflow-hidden">
+    <!-- Background number -->
+    <span class="absolute right-8 top-24 text-[18vw] font-bold leading-none select-none pointer-events-none playfair" style="color:rgba(196,98,45,0.06);">01</span>
+
+    <div class="relative z-10 max-w-4xl">
+      <p class="section-label mb-6 fade-up delay-1">Software Designer · Beginner · Available for Work</p>
+
+      <h1 class="playfair text-5xl md:text-7xl font-bold leading-[1.05] mb-6 fade-up delay-2">
+        Alex Mercer.<br/>
+        <span class="italic font-normal" style="color:var(--rust);">I design things</span><br/>
+        that just work.
+      </h1>
+
+      <p class="text-sm leading-relaxed max-w-md mb-10 fade-up delay-3" style="opacity:0.6;">
+        A passionate beginner building clean, user-centred digital products. Currently studying human–computer interaction and shipping side projects to grow my craft.
+      </p>
+
+      <div class="flex flex-wrap gap-4 fade-up delay-4">
+        <a href="#work" class="btn-primary px-7 py-3 text-xs tracking-widest uppercase">View Work</a>
+        <a href="#contact" class="px-7 py-3 text-xs tracking-widest uppercase border hover-line" style="border-color:rgba(26,26,26,0.3);">Get in Touch</a>
+      </div>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="absolute bottom-8 left-8 flex items-center gap-3 fade-up delay-5" style="opacity:0.4;">
+      <div class="w-8 h-px" style="background:var(--ink);"></div>
+      <span style="font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;">Scroll</span>
+    </div>
+  </section>
+
+  <!-- ─── WORK ─── -->
+  <section id="work" class="px-8 md:px-20 py-24">
+    <hr class="divider mb-16"/>
+
+    <div class="flex items-end justify-between mb-12">
+      <div>
+        <p class="section-label mb-2">Selected Work</p>
+        <h2 class="playfair text-4xl md:text-5xl font-bold">Projects</h2>
+      </div>
+      <span class="playfair italic text-lg" style="opacity:0.25;">2024 – 2025</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Card 1 -->
+      <div class="card p-6 rounded">
+        <div class="w-full h-36 rounded mb-6 flex items-center justify-center text-3xl" style="background:linear-gradient(135deg,#C4622D22,#7A8C6E22);">🌿</div>
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span class="tag px-2 py-1 rounded-sm">UI/UX</span>
+          <span class="tag px-2 py-1 rounded-sm">Figma</span>
+        </div>
+        <h3 class="playfair text-xl font-bold mb-2">GreenTrack App</h3>
+        <p class="text-xs leading-relaxed" style="opacity:0.55;">A habit-tracking app for personal sustainability goals. Designed the full user flow and high-fidelity prototype in Figma.</p>
+        <a href="#" class="hover-line text-xs mt-4 inline-block" style="color:var(--rust);">View Case Study →</a>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="card p-6 rounded">
+        <div class="w-full h-36 rounded mb-6 flex items-center justify-center text-3xl" style="background:linear-gradient(135deg,#1A1A1A11,#C4622D22);">📚</div>
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span class="tag px-2 py-1 rounded-sm">Web Design</span>
+          <span class="tag px-2 py-1 rounded-sm">HTML/CSS</span>
+        </div>
+        <h3 class="playfair text-xl font-bold mb-2">BookNest Landing</h3>
+        <p class="text-xs leading-relaxed" style="opacity:0.55;">A landing page for an indie bookshop. Focused on editorial typography and a warm, inviting visual language.</p>
+        <a href="#" class="hover-line text-xs mt-4 inline-block" style="color:var(--rust);">View Project →</a>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="card p-6 rounded">
+        <div class="w-full h-36 rounded mb-6 flex items-center justify-center text-3xl" style="background:linear-gradient(135deg,#7A8C6E22,#C4622D11);">🎨</div>
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span class="tag px-2 py-1 rounded-sm">Design System</span>
+          <span class="tag px-2 py-1 rounded-sm">Figma</span>
+        </div>
+        <h3 class="playfair text-xl font-bold mb-2">Pebble UI Kit</h3>
+        <p class="text-xs leading-relaxed" style="opacity:0.55;">A minimal design system with reusable components, colour tokens, and typography scales — my first design system project.</p>
+        <a href="#" class="hover-line text-xs mt-4 inline-block" style="color:var(--rust);">View on Figma →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── ABOUT ─── -->
+  <section id="about" class="px-8 md:px-20 py-24" style="background:rgba(26,26,26,0.03);">
+    <hr class="divider mb-16"/>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+
+      <!-- Left -->
+      <div>
+        <p class="section-label mb-2">About Me</p>
+        <h2 class="playfair text-4xl font-bold mb-6">Learning by<br/><em>building.</em></h2>
+        <p class="text-sm leading-loose mb-4" style="opacity:0.65;">
+          Hi, I'm Alex — a 22-year-old software design student based in Lagos. I'm passionate about the intersection of clean code and thoughtful design. I believe great software should feel effortless.
+        </p>
+        <p class="text-sm leading-loose" style="opacity:0.65;">
+          Right now I'm deepening my skills in interaction design and front-end development, and looking for opportunities to collaborate on real products where I can learn and contribute.
+        </p>
+
+        <div class="flex gap-6 mt-8">
+          <a href="#" class="hover-line text-xs tracking-widest uppercase" style="color:var(--rust);">Resume →</a>
+          <a href="#" class="hover-line text-xs tracking-widest uppercase" style="opacity:0.5;">GitHub →</a>
+          <a href="#" class="hover-line text-xs tracking-widest uppercase" style="opacity:0.5;">LinkedIn →</a>
+        </div>
+      </div>
+
+      <!-- Right: Skills -->
+      <div>
+        <p class="section-label mb-6">Toolkit & Skills</p>
+        <div class="space-y-6">
+
+          <div>
+            <div class="flex justify-between text-xs mb-2" style="opacity:0.7;">
+              <span>Figma / Prototyping</span><span>80%</span>
+            </div>
+            <div class="skill-bar"><div class="skill-fill" style="width:80%"></div></div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs mb-2" style="opacity:0.7;">
+              <span>HTML / CSS / Tailwind</span><span>70%</span>
+            </div>
+            <div class="skill-bar"><div class="skill-fill" style="width:70%"></div></div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs mb-2" style="opacity:0.7;">
+              <span>JavaScript (Basics)</span><span>50%</span>
+            </div>
+            <div class="skill-bar"><div class="skill-fill" style="width:50%"></div></div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs mb-2" style="opacity:0.7;">
+              <span>UX Research</span><span>60%</span>
+            </div>
+            <div class="skill-bar"><div class="skill-fill" style="width:60%"></div></div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs mb-2" style="opacity:0.7;">
+              <span>Design Systems</span><span>45%</span>
+            </div>
+            <div class="skill-bar"><div class="skill-fill" style="width:45%"></div></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CONTACT ─── -->
+  <section id="contact" class="px-8 md:px-20 py-24">
+    <hr class="divider mb-16"/>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+
+      <div>
+        <p class="section-label mb-2">Say Hello</p>
+        <h2 class="playfair text-4xl font-bold mb-4">Let's work<br/><em>together.</em></h2>
+        <p class="text-sm leading-relaxed max-w-xs" style="opacity:0.55;">
+          Whether it's a quick critique, a collaboration, or an internship opportunity — I'd love to hear from you.
+        </p>
+        <p class="text-sm mt-6" style="color:var(--rust);">alex.mercer@email.com</p>
+      </div>
+
+      <div class="space-y-8">
+        <div>
+          <label class="section-label block mb-2">Name</label>
+          <input type="text" class="field" placeholder="Your full name"/>
+        </div>
+        <div>
+          <label class="section-label block mb-2">Email</label>
+          <input type="email" class="field" placeholder="your@email.com"/>
+        </div>
+        <div>
+          <label class="section-label block mb-2">Message</label>
+          <textarea class="field resize-none" rows="3" placeholder="What's on your mind?"></textarea>
+        </div>
+        <button class="btn-primary px-8 py-3 text-xs tracking-widest uppercase w-full md:w-auto">Send Message</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="px-8 md:px-20 py-8 flex flex-col md:flex-row items-center justify-between gap-4" style="border-top:1px solid rgba(26,26,26,0.1);">
+    <span class="playfair font-bold">AM.</span>
+    <span class="text-xs" style="opacity:0.35;">© 2025 Alex Mercer. Crafted with intention.</span>
+    <div class="flex gap-6">
+      <a href="#" class="nav-link hover-line">Dribbble</a>
+      <a href="#" class="nav-link hover-line">Twitter</a>
+    </div>
+  </footer>
+
+  <!-- ─── SCRIPTS ─── -->
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      ring.style.left = e.clientX + 'px';
+      ring.style.top = e.clientY + 'px';
+    });
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.transform = 'translate(-50%,-50%) scale(2)';
+        ring.style.opacity = '0.2';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+        ring.style.opacity = '0.5';
+      });
+    });
+
+    // Skill bars animate on scroll
+    const fills = document.querySelectorAll('.skill-fill');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('animate');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.4 });
+    fills.forEach(f => observer.observe(f));
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+      });
+    });
+  </script>
+</body>
+</html>
