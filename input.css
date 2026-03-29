@@ -13,7 +13,7 @@ body {
     background-color: var(--cream);
     color: var(--ink);
     font-family: 'DM Mono', monospace;
-    /* cursor: none; */
+    cursor: none;
 }
 
 /* Custom cursor */
